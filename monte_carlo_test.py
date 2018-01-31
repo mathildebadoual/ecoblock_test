@@ -11,4 +11,21 @@ def pv_generation(irradiance):
     return coeff * (open_circuit_voltage + np.log(irradiance))
 
 
-def
+
+class System:
+    def __init__(self, start_time, end_time):
+        self.start_time = start_time
+        self.end_time = end_time
+
+    def run_simulation(self):
+        pass
+
+    def run_step(self):
+        pass
+
+    def next_step(self):
+        pass
+
+    def plot_results(self):
+        pass
+
