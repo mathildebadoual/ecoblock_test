@@ -34,7 +34,8 @@ create_table_results = ("CREATE TABLE IF NOT EXISTS " +
                         simulation_id INTEGER,
                         simulation_num INTEGER,
                         time TIME,
-                        demand FLOAT)""")
+                        demand FLOAT,
+                        ev_demand FLOAT)""")
 
 cur.execute(drop_table_results)
 cur.execute(create_table_results)
@@ -57,19 +58,27 @@ with open(fname, 'rU') as main_data_csv:
         timelapse.append(sim_timelapse)
         sim_numof = int(i['simulations'])
         simulation = 1
+        print sim_timelapse
         while simulation < sim_numof + 1:
             count = 0
             hour = 1
             while count < sim_timelapse:
+                ev_load = 0
                 timeofday = str(date_time.time())
+
+                sql_ev_script = 'SELECT SUM (load_demand) FROM ev_state WHERE hour = ? AND simulation_id = ? AND simulation_num = ?'
+                ev_load_sum = cur.execute(sql_ev_script, (hour, sim_id, simulation))
+                for row in ev_load_sum:
+                    ev_load = row[0]
+
                 sql_script = 'SELECT SUM (load_demand) FROM data_results WHERE hour = ? AND simulation_id = ? AND simulation_num = ?'
                 load_sum = cur.execute(sql_script, (hour, sim_id, simulation))
+
                 for i in load_sum:
                     load = i[0]
-                    print load
                     sql_script = '''INSERT OR IGNORE INTO [results]
-                                    (time, demand, simulation_id, simulation_num) VALUES (?,?,?,?)'''
-                    sql = cur.execute(sql_script, (timeofday,load, sim_id, simulation))
+                                    (time, demand, simulation_id, simulation_num, ev_demand) VALUES (?,?,?,?,?)'''
+                    sql = cur.execute(sql_script, (timeofday,load, sim_id, simulation, ev_load))
 
                 date_time = date_time + timedelta(minutes = 60)
                 count += 1
