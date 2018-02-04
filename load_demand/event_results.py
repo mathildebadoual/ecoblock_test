@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+import datetime as dtt
 from datetime import datetime
 from datetime import timedelta
 import time
@@ -34,6 +34,7 @@ create_table_results = ("CREATE TABLE IF NOT EXISTS " +
                         simulation_id INTEGER,
                         simulation_num INTEGER,
                         time TIME,
+                        timestamp TIMESTAMP,
                         demand FLOAT,
                         ev_demand FLOAT)""")
 
@@ -53,16 +54,35 @@ with open(fname, 'rU') as main_data_csv:
     for i in main_data_reader:
         sim_id = i['id']
         sim_starttime = str(i['start_time'])
-        date_time = (datetime.strptime(sim_starttime, '%H:%M:%S'))
+        season = str(i['season'])
+
+        if season == 'winter':
+            sim_starttime = "01/01/17 "+str(i['start_time'])
+            date_time = (datetime.strptime(sim_starttime, '%d/%m/%y %H:%M:%S'))
+
+        elif season == 'spring':
+            sim_starttime = "01/03/17 "+str(i['start_time'])
+            date_time = (datetime.strptime(sim_starttime, '%d/%m/%y %H:%M:%S'))
+
+        elif season == 'summer':
+            sim_starttime = "01/05/17 "+str(i['start_time'])
+            date_time = (datetime.strptime(sim_starttime, '%d/%m/%y %H:%M:%S'))
+
+        elif season == 'fall':
+            sim_starttime = "01/09/17 "+str(i['start_time'])
+            date_time = (datetime.strptime(sim_starttime, '%d/%m/%y %H:%M:%S'))
+
         sim_timelapse = int(i['hours'])
         timelapse.append(sim_timelapse)
         sim_numof = int(i['simulations'])
+        season = str(i['season'])
         simulation = 1
         print sim_timelapse
         while simulation < sim_numof + 1:
             count = 0
             hour = 1
             while count < sim_timelapse:
+                ut_time = (date_time - dtt.datetime(1970, 1, 1)).total_seconds()
                 ev_load = 0
                 timeofday = str(date_time.time())
 
@@ -77,8 +97,8 @@ with open(fname, 'rU') as main_data_csv:
                 for i in load_sum:
                     load = i[0]
                     sql_script = '''INSERT OR IGNORE INTO [results]
-                                    (time, demand, simulation_id, simulation_num, ev_demand) VALUES (?,?,?,?,?)'''
-                    sql = cur.execute(sql_script, (timeofday,load, sim_id, simulation, ev_load))
+                                    (time, demand, simulation_id, simulation_num, ev_demand, timestamp) VALUES (?,?,?,?,?,?)'''
+                    sql = cur.execute(sql_script, (timeofday,load, sim_id, simulation, ev_load,ut_time))
 
                 date_time = date_time + timedelta(minutes = 60)
                 count += 1
