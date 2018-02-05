@@ -19,6 +19,7 @@ class IndividualHome:
         self.ev_battery_soc = []
         self.start_date = start_date
         self.end_date = end_date
+        self.time
 
 
     def battery_charged(self, energy_stored):
