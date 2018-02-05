@@ -60,7 +60,7 @@ class System:
         plt.figure(figsize=(10, 5))
 
         for i in range(len(to_plot)):
-            fig, ax = plt.subplot(61i)
+            fig, ax = plt.subplot(611+i)
             ax.plot_date(dates, to_plot[i][0])
             ax.xaxis.set_major_formatter(date_formater)
             plt.title(to_plot[i][0])
