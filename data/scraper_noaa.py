@@ -176,6 +176,6 @@ dump_csv(
     CAL_COORDS['west'],
     CAL_COORDS['north'],
     CAL_COORDS['east'],
-    '2017-05-01',
-    '2017-05-03',
+    '2017-07-31',
+    '2017-08-04',
     altitude_layer=37)

@@ -12,6 +12,7 @@ def import_load_demand(start_date, end_date):
     cur.execute(sql_script, (start_date, end_date))
     load_demand = cur.fetchall()
     conn.close()
+    print(np.array(load_demand).shape)
     return np.array(load_demand)
 
 def import_ev_demand(start_date, end_date):
@@ -21,24 +22,30 @@ def import_ev_demand(start_date, end_date):
     cur.execute(sql_script, (start_date, end_date))
     ev_demand = cur.fetchall()
     conn.close()
+    print(np.array(ev_demand).shape)
     return np.array(ev_demand)
 
 def import_pv_generation(start_date, end_date):
-    data = pd.read_csv('data/ecoblock_irr.csv')
-    irradiance = data['irradiance'][(data['unix_epoch'] >= start_date) && (data['unix_epoch'] >= end_date)].as_matrix()
+    #data = pd.read_csv('/Users/mathildebadoual/code/ecoblock_test/data/irradiance.csv')
+    #irradiance = data['irradiance'][(data['unix_epoch'] >= start_date) & (data['unix_epoch'] >= end_date)].as_matrix()
+    #return irradiance
 
+    data = pd.read_csv('/Users/mathildebadoual/code/ecoblock_test/data/pv_generation.csv')
+    pv_generation = data['pv_generation'].as_matrix()
+    print(len(pv_generation))
+    return pv_generation
 
 def import_prices_to_buy(start_date, end_date):
-    data = pd.read_csv('data/prices_a10.csv')
+    data = pd.read_csv('/Users/mathildebadoual/code/ecoblock_test/data/prices_a10.csv')
     prices_to_buy_day = data['prices_to_buy_summer'].as_matrix()
-    simulation_horizon = (start_date - end_date) / 3600
+    simulation_horizon = (end_date - start_date) / 3600
     prices_to_buy = prices_to_buy_day
-    for _ in range(simulation_horizon / 24 - 1):
-        prices_to_buy = np.concatenate(prices_to_buy, prices_to_buy_day)
+    for i in range(int(simulation_horizon / 24)):
+        prices_to_buy = np.concatenate((prices_to_buy, prices_to_buy_day))
+    print(len(prices_to_buy))
     return prices_to_buy
 
 
 def import_prices_to_sell(start_date, end_date):
-    simulation_horizon = (start_date - end_date) / 3600
-    return np.array([0.07] * (simulation_horizon / 24))
-
+    simulation_horizon = (end_date - start_date) / 3600
+    return np.array([0.07] * int(simulation_horizon))
