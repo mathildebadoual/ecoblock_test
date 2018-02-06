@@ -48,4 +48,5 @@ def import_prices_to_buy(start_date, end_date):
 
 def import_prices_to_sell(start_date, end_date):
     simulation_horizon = (end_date - start_date) / 3600
-    return np.array([0.07] * int(simulation_horizon))
+    print(np.array([0.07] * int(simulation_horizon + 1)).shape)
+    return np.array([0.07] * int(simulation_horizon + 1))
