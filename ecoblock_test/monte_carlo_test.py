@@ -3,14 +3,6 @@ import ecoblock_test.get_data as get_data
 import matplotlib.pyplot as plt
 import time
 
-# irradiance in 1 kW/m**2 = 1 sun
-
-def pv_generation(irradiance):
-    open_circuit_voltage = 0.612
-    temperature = 25
-    coeff = 0.0257
-    return coeff * (open_circuit_voltage + np.log(irradiance))
-
 
 class System:
     def __init__(self, start_date, end_date):
@@ -51,9 +43,7 @@ class System:
     def plot_results(self):
         dates = [self.start_date + 3600*i for i in range(self.simulation_horizon)]
         dates_to_plot = [self.start_date + 3600*5*i for i in range(int(self.simulation_horizon/5))]
-        print(dates)
         labels = [time.asctime(time.gmtime(date)) for date in dates_to_plot]
-        print(labels)
         to_plot = [(self.load_from_grid, 'load from grid'),
                 (self.load_to_grid, 'load to grid'),
                 (self.flywheel.soc_record, 'flywheel load'),
@@ -118,6 +108,3 @@ class FlyWheel:
                     self.soc_record[index] += self.discharging_rate_max_in_hour
                     self.system.load_from_grid[index] += - energy_enabled + self.discharging_rate_max_in_hour
                 self.system.load_from_grid[index] += - energy + energy_enabled
-
-
-
