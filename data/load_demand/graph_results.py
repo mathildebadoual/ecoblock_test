@@ -24,7 +24,7 @@ for row in sql:
     y_values_ev.append(row[2])
 
 date_list = matplotlib.dates.date2num(x_values)
-fig, axes_array = plt.subplots(2, sharex=True, figsize=(9, 7))
+fig, axes_array = plt.subplots(3, sharex=True, figsize=(9, 7))
 
 axes_array[0].plot(date_list,y_values_houses,label="Houses")
 axes_array[0].set_ylabel("kWh", fontsize=fs)
