@@ -144,7 +144,7 @@ with open(fname, 'rU') as main_data_csv:
         '(date, day, time, timestamp, season, irradiance) VALUES ' +
         '(' + '?' + ',' + '?' + ',' + '?' + ',' + '?' + ',' + '?' + ',' + '?' + ')')
 
-        cur.execute(sql_script,(date_time, day, hour, ut, season, irradiance))
+        cur.execute(sql_script,(date_time, day, onlytime, ut, season, irradiance))
 
 conn.commit()
 conn.close()
