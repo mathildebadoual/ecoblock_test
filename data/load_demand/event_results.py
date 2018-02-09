@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import random
 from matplotlib.dates import DateFormatter, HourLocator, MinuteLocator
 
+roof_usable_area_m2 = 37000*.75*.092903 #in m2
 
 weekdaytonumber = {'Monday':0, 'Tuesday':1, 'Wednesday':2, 'Thursday':3,
                 'Friday':4, 'Saturday':5, 'Sunday':6}
@@ -35,8 +36,10 @@ create_table_results = ("CREATE TABLE IF NOT EXISTS " +
                         simulation_num INTEGER,
                         time TIME,
                         timestamp TIMESTAMP,
+                        irradiance FLOAT,
                         demand FLOAT,
-                        ev_demand FLOAT)""")
+                        ev_demand FLOAT,
+                        pv_generation)""")
 
 cur.execute(drop_table_results)
 cur.execute(create_table_results)
@@ -84,6 +87,8 @@ with open(fname, 'rU') as main_data_csv:
             while count < sim_timelapse:
                 ut_time = (date_time - dtt.datetime(1970, 1, 1)).total_seconds()
                 ev_load = 0
+                pv_irradiance_total = 0
+                pv_irradiance_input = 0
                 timeofday = str(date_time.time())
 
                 sql_ev_script = 'SELECT SUM (load_demand) FROM ev_state WHERE hour = ? AND simulation_id = ? AND simulation_num = ?'
@@ -91,14 +96,23 @@ with open(fname, 'rU') as main_data_csv:
                 for row in ev_load_sum:
                     ev_load = row[0]
 
+                sql_pv_script = 'SELECT irradiance FROM pv_irradiance_data WHERE hour = ? AND simulation_id = ? AND simulation_num = ?'
+                pv_irradiance = cur.execute(sql_pv_script, (hour, sim_id, simulation))
+                for row in pv_irradiance:
+                    pv_irradiance_unit = row[0]
+                    pv_irradiance_total = (0.0010103985 * pv_irradiance_unit) * roof_usable_area_m2
+                print pv_irradiance_unit
+                print pv_irradiance_total
+
                 sql_script = 'SELECT SUM (load_demand) FROM data_results WHERE hour = ? AND simulation_id = ? AND simulation_num = ?'
                 load_sum = cur.execute(sql_script, (hour, sim_id, simulation))
 
                 for i in load_sum:
                     load = i[0]
                     sql_script = '''INSERT OR IGNORE INTO [results]
-                                    (time, demand, simulation_id, simulation_num, ev_demand, timestamp) VALUES (?,?,?,?,?,?)'''
-                    sql = cur.execute(sql_script, (timeofday,load, sim_id, simulation, ev_load,ut_time))
+                                    (simulation_id, simulation_num, time, timestamp, irradiance, demand, ev_demand, pv_generation) VALUES (?,?,?,?,?,?,?,?)'''
+                    sql = cur.execute(sql_script, (sim_id, simulation, timeofday, ut_time, pv_irradiance_input, load, ev_load, pv_irradiance_total))
+
 
                 date_time = date_time + timedelta(minutes = 60)
                 count += 1
