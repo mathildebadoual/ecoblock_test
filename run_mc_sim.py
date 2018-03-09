@@ -1,12 +1,13 @@
 import ecoblock_test.simulation as sim
 import matplotlib.pyplot as plt
 import pandas as pd
-
+import numpy as np
 
 NUMBER_OF_SIMULATIONS = 20
 NUMBER_OF_SIMULATIONS_ID = 28
 
 cost_record = []
+flywheel_final_soc = []
 
 def plot_hist(data):
     plt.figure()
@@ -29,6 +30,7 @@ for sim_id in range(1, NUMBER_OF_SIMULATIONS_ID + 1):
         system.load_data()
         system.run_simulation()
         cost_record.append(system.get_cost())
+        flywheel_final_soc.append(np.sum(system.flywheel.soc_record))
 
         #print('Is at cost:', system.get_cost())
         #system.plot_results()
@@ -38,6 +40,7 @@ for sim_id in range(1, NUMBER_OF_SIMULATIONS_ID + 1):
 data_result = pd.DataFrame(sim_id_list, columns=['sim_id'])
 data_result['sim_num'] = sim_number_list
 data_result['cost'] = cost_record
+data_result['flywheel_final_soc'] = flywheel_final_soc
 data_result.to_csv('data_result.csv')
 cost_record_df = pd.DataFrame(cost_record, columns=['cost'])
 plot_hist(cost_record_df['cost'])
