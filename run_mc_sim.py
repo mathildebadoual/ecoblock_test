@@ -32,10 +32,10 @@ for sim_id in range(1, NUMBER_OF_SIMULATIONS_ID + 1):
         cost_record.append(system.get_cost())
         flywheel_final_soc.append(np.sum(system.flywheel.soc_record))
 
-        #print('Is at cost:', system.get_cost())
-        #system.plot_results()
-        #file_name = 'normal' + str(sim_number) + '-' + str(sim_id) + '.png'
-        #plt.savefig(file_name)
+        print('Is at cost:', system.get_cost())
+        system.plot_results()
+        file_name = 'normal' + str(sim_number) + '-' + str(sim_id) + '.png'
+        plt.savefig(file_name)
 
 data_result = pd.DataFrame(sim_id_list, columns=['sim_id'])
 data_result['sim_num'] = sim_number_list

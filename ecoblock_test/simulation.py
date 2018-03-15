@@ -34,7 +34,7 @@ class System:
                     self.flywheel.discharge(unchanged_consumption, i)
             if unchanged_consumption < 0:
                 if self.flywheel.is_full() or price_to_sell >= self.ref_price_to_sell:
-                    self.load_to_grid[i] += unchanged_consumption
+                    self.load_to_grid[i] += - unchanged_consumption
                 else:
                     self.flywheel.charge(- unchanged_consumption, i)
         self.total_cost = sum(self.load_to_grid)*0.07 + np.dot(self.load_from_grid.T, self.prices_to_buy)
